@@ -1,0 +1,6 @@
+{
+  "name": "Mind Compass",
+  "description": "An intuitive, responsive semantic search engine for psychology students to map everyday human behaviors to clinical concepts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

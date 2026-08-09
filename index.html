@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/jpeg" href="/img/logo.PNG">
+  <title>Mind compass</title>
+
+  <!-- Theme resolution. Must run before first paint and before any stylesheet,
+       so the correct data-theme is on <html> when the first styles apply and
+       there is no flash of the wrong theme.
+       Order: saved choice → OS preference → light. -->
+  <script>
+    (function () {
+      var saved;
+      try {
+        saved = localStorage.getItem('mc-theme');
+      } catch (e) {
+        // Private mode / storage disabled — fall through to the OS preference.
+      }
+      if (saved !== 'dark' && saved !== 'light') saved = null;
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

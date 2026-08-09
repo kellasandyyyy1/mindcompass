@@ -1,0 +1,276 @@
+/* ==========================================================================
+   tokens.css — the single source of truth for colour, spacing and radius.
+
+   RULES
+   1. No raw hex value may appear anywhere in the codebase except this file.
+   2. Never use `opacity` to dim text. Pick a different token instead.
+   3. Components reference `var(--…)` only (usually via the Tailwind
+      utility aliases registered in index.css).
+
+   Structure
+     §1  Light mode surfaces / text
+     §2  Dark mode surfaces / text
+     §3  Mode-invariant tokens (brand, semantics, type, space, radius)
+     §4  Theme-aware semantic *text* variants  ← see note in §4
+     §5  Disclaimer banner palette
+     §6  Brand illustration palette (logo artwork, fixed by design)
+   ========================================================================== */
+
+
+/* === §1 Light mode ====================================================== */
+:root[data-theme="light"] {
+  /* Makes native UI (scrollbars, <select> popups, form controls) match. */
+  color-scheme: light;
+
+  --page-bg:        #F1EDE6;
+  --surface:        #FFFFFF;
+  --surface-raised: #F7F4EF;
+  --text-body:      #1A1A1A;
+  --text-muted:     #6B6860;
+  --text-link:      #1A4A9A;
+  --border:         rgba(0, 0, 0, 0.10);
+  --border-strong:  rgba(0, 0, 0, 0.18);
+}
+
+/* === §2 Dark mode ======================================================= */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --page-bg:        #1A1A1A;
+  --surface:        #242424;
+  --surface-raised: #2C2C2C;
+  --text-body:      #E8E6E0;
+  --text-muted:     #9A9892;
+  --text-link:      #7AAAF0;
+  --border:         rgba(255, 255, 255, 0.10);
+  --border-strong:  rgba(255, 255, 255, 0.18);
+}
+
+/* No `data-theme` yet (e.g. the inline head script was blocked) — fall back to
+   the OS preference so the page is never unstyled. The attribute selectors
+   above still win once the script runs, because they are more specific. */
+:root:not([data-theme]) {
+  --page-bg:        #F1EDE6;
+  --surface:        #FFFFFF;
+  --surface-raised: #F7F4EF;
+  --text-body:      #1A1A1A;
+  --text-muted:     #6B6860;
+  --text-link:      #1A4A9A;
+  --border:         rgba(0, 0, 0, 0.10);
+  --border-strong:  rgba(0, 0, 0, 0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --page-bg:        #1A1A1A;
+    --surface:        #242424;
+    --surface-raised: #2C2C2C;
+    --text-body:      #E8E6E0;
+    --text-muted:     #9A9892;
+    --text-link:      #7AAAF0;
+    --border:         rgba(255, 255, 255, 0.10);
+    --border-strong:  rgba(255, 255, 255, 0.18);
+  }
+}
+
+
+/* === §3 Mode-invariant tokens =========================================== */
+:root {
+  /* Brand */
+  --color-accent:       #3B6FD4;
+  --color-accent-bg:    rgba(59, 111, 212, 0.10);
+  /* Darker step for solid-fill button hover. White text on this is 6.54:1. */
+  --color-accent-hover: #2F5AB0;
+  /* Text placed *on top of* a solid --color-accent fill. */
+  --color-on-accent:    #FFFFFF;
+
+  /* Semantic: use ONLY for genuine warnings/alerts */
+  --color-warning:      #E8903A;
+  --color-warning-bg:   rgba(232, 144, 58, 0.10);
+
+  /* Semantic: use for educational/insight callouts */
+  --color-insight:      #6B8FD4;
+  --color-insight-bg:   rgba(107, 143, 212, 0.10);
+
+  /* Semantic: correct answers, confirmed citations, low-severity states */
+  --color-success:      #5BA05A;
+  --color-success-bg:   rgba(91, 160, 90, 0.10);
+
+  /* Match meter levels */
+  --color-match-high:   #D85A30;
+  --color-match-mid:    #E8A040;
+  --color-match-low:    #5BA05A;
+  /* Hatching laid over the highest-severity fill so the level survives being
+     read without colour. Sits on saturated fills in both modes. */
+  --stripe-overlay:     rgba(255, 255, 255, 0.22);
+
+  /* Typography.
+     --font-code holds the literal so index.css can alias Tailwind's own
+     --font-mono to it without writing `--font-mono: var(--font-mono)`. */
+  --font-code:    'JetBrains Mono', monospace;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    var(--font-code);
+
+  /* Spacing scale */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  40px;
+
+  /* Radius scale */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+}
+
+
+/* === §4 Theme-aware semantic TEXT variants ==============================
+   The §3 semantic colours are tuned as *fills* — progress bars, dots, icon
+   chips, 10%-alpha backgrounds — where WCAG's 3:1 non-text rule applies.
+   Used as body text they fail badly on the light page (measured against
+   --page-bg #F1EDE6):
+
+       --color-warning    #E8903A → 2.12:1   FAIL
+       --color-insight    #6B8FD4 → 2.77:1   FAIL
+       --color-match-low  #5BA05A → 2.72:1   FAIL
+       --color-match-high #D85A30 → 3.32:1   large text only
+
+   Rule 2 says to fix contrast by changing the token, not by dimming — so
+   each semantic gets a per-mode text token. Use `--color-*-text` whenever the
+   colour carries words; use the §3 token for fills and borders.
+   Every pair below is ≥ 4.5:1 on both --page-bg and --surface. */
+
+:root[data-theme="light"],
+:root:not([data-theme]) {
+  --color-warning-text: #8A4C0C;  /* 5.77:1 on page */
+  --color-insight-text: #2F4E96;  /* 6.79:1 on page */
+  --color-success-text: #2F6B36;  /* 5.49:1 on page */
+  --color-match-high-text: #A8401A;  /* 5.27:1 on page */
+}
+
+:root[data-theme="dark"] {
+  --color-warning-text: #F0A868;  /* 8.71:1 on page, 7.77:1 on surface */
+  --color-insight-text: #9DB8EC;  /* 8.70:1 on page, 7.76:1 on surface */
+  --color-success-text: #7FBF7E;  /* 8.00:1 on page, 7.14:1 on surface */
+  --color-match-high-text: #F08A5D;  /* 7.04:1 on page, 6.28:1 on surface */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-warning-text: #F0A868;
+    --color-insight-text: #9DB8EC;
+    --color-success-text: #7FBF7E;
+    --color-match-high-text: #F08A5D;
+  }
+}
+
+
+/* === §4b Category palette ==============================================
+   One hue set shared by the homepage suggestion tags, the citation type tags
+   and the three-roots icons, so "green" means the same thing everywhere.
+
+   Each hue is a fixed 12% tint (a background — no contrast requirement) plus a
+   per-mode ink for the text on top. Every ink below is ≥ 4.5:1 against its own
+   tint composited over BOTH --page-bg and --surface, in its mode.
+
+   Two values differ from the original spec because the spec's failed:
+     green ink light  #1A7840 → #176B38  (was 4.22:1 on page, now 5.02:1)
+     world icon light #32A064 → uses the green ink (was 2.53:1, now 5.02:1) */
+
+:root {
+  --cat-blue-tint:    rgba(59, 111, 212, 0.12);
+  --cat-purple-tint:  rgba(138, 90, 200, 0.12);
+  --cat-green-tint:   rgba(50, 160, 100, 0.12);
+  --cat-amber-tint:   rgba(200, 140, 40, 0.12);
+  --cat-red-tint:     rgba(216, 90, 48, 0.12);
+  --cat-magenta-tint: rgba(180, 80, 160, 0.12);
+  --cat-teal-tint:    rgba(40, 140, 180, 0.12);
+  --cat-neutral-tint: rgba(100, 100, 100, 0.12);
+}
+
+:root[data-theme="light"],
+:root:not([data-theme]) {
+  --cat-blue:    #1A4A9A;
+  --cat-purple:  #5E3A9A;
+  --cat-green:   #176B38;
+  --cat-amber:   #8A5A00;
+  --cat-red:     #A83018;
+  --cat-magenta: #882070;
+  --cat-teal:    #155878;
+  --cat-neutral: #484848;
+}
+
+:root[data-theme="dark"] {
+  --cat-blue:    #7AAAF0;
+  --cat-purple:  #B08AE8;
+  --cat-green:   #5AC888;
+  --cat-amber:   #E8A848;
+  --cat-red:     #F08060;
+  --cat-magenta: #E080C8;
+  --cat-teal:    #60B8D8;
+  --cat-neutral: #A0A0A0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --cat-blue:    #7AAAF0;
+    --cat-purple:  #B08AE8;
+    --cat-green:   #5AC888;
+    --cat-amber:   #E8A848;
+    --cat-red:     #F08060;
+    --cat-magenta: #E080C8;
+    --cat-teal:    #60B8D8;
+    --cat-neutral: #A0A0A0;
+  }
+}
+
+
+/* === §5 Disclaimer banner ==============================================
+   Deliberately *not* --surface: the safety message must read as a distinct
+   panel, not blend into the page. */
+
+:root[data-theme="light"],
+:root:not([data-theme]) {
+  --disclaimer-bg:     #EFF4FF;
+  --disclaimer-border: #3B6FD4;
+  --disclaimer-text:   #1A2E6A;  /* 11.60:1 on --disclaimer-bg — AAA */
+}
+
+:root[data-theme="dark"] {
+  --disclaimer-bg:     #1E2535;  /* noticeably lighter than the #1A1A1A page */
+  --disclaimer-border: #5B8FE8;
+  --disclaimer-text:   #B8CCEE;  /* 9.41:1 on --disclaimer-bg — AAA */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --disclaimer-bg:     #1E2535;
+    --disclaimer-border: #5B8FE8;
+    --disclaimer-text:   #B8CCEE;
+  }
+}
+
+
+/* === §6 Brand illustration palette =====================================
+   Fixed colours for the Mind Compass logo artwork. These are a drawing, not a
+   theme: they must stay identical in light and dark, exactly like a photo.
+   They live here so rule 1 ("no hex outside tokens.css") holds everywhere. */
+:root {
+  --logo-teal-bg:        #116A7B;
+  --logo-yellow-aura:    #E5A93C;
+  --logo-blazer-green:   #A6BCA9;
+  --logo-strap-dark:     #1E362C;
+  --logo-strap-gold:     #E09F3E;
+  --logo-necklace-teal:  #137A7F;
+  --logo-necklace-gold:  #E5A93C;
+  --logo-skin-peach:     #FCB8AF;
+  --logo-skin-nails:     #D4624F;
+  --logo-turtleneck:     #FAF9F6;
+  --logo-pants-brown:    #5C3A21;
+  --logo-belt-dark:      #13231D;
+  --logo-scribble-black: #12261E;
+  --logo-buckle-stroke:  #C98B2C;
+  --logo-ring-stroke:    #E1E0DA;
+  --logo-outline:        #0E1A15;
+}
