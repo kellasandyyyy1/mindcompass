@@ -698,11 +698,16 @@ export default function App() {
               </p>
             </div>
 
-            {/* Search Input Engine */}
+            {/* Search Input Engine. This wrapper is the positioning context for
+                the two dropdowns, so it holds the bar and the overlays and
+                nothing else — anything else inside it would push `top: 100%`
+                down past the bar and the panels would open below the fold. */}
             <div
               id="search-engine-wrap"
               ref={searchWrapRef}
-              className="w-full max-w-2xl relative z-40"
+              /* z-45: above the sticky #section-nav-tabs (z-40) so an open
+                 dropdown wins, but under the page header (z-50). */
+              className="w-full max-w-2xl relative z-[45]"
             >
 
               <div
@@ -788,7 +793,7 @@ export default function App() {
                 <div
                   id="recent-dropdown"
                   onMouseDown={(e) => e.preventDefault()}
-                  className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 p-2 bg-surface border border-line-strong rounded-lg shadow-lg"
+                  className="absolute top-[calc(100%+4px)] left-0 right-0 z-[9999] p-2 bg-surface border border-line-strong rounded-lg shadow-lg"
                 >
                   <p className="text-[12px] font-medium text-muted px-2 py-1 mb-1">
                     Recent
@@ -895,8 +900,11 @@ export default function App() {
                   )}
                 </div>
               )}
+            </div>
 
-              {/* Mutually Exclusive Content States below Search Bar */}
+            {/* Mutually Exclusive Content States below Search Bar. A sibling of
+                the search wrapper, not a child — see the note above it. */}
+            <div id="search-below-content" className="w-full max-w-2xl">
               {loading ? (
                 <div id="search-loading-state" className="mt-8 py-8 flex flex-col items-center justify-center gap-3">
                   <div className="h-7 w-7 rounded-full border-2 border-t-brand border-r-transparent border-b-transparent border-l-transparent animate-spin" />
